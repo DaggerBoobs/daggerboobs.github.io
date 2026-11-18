@@ -172,6 +172,32 @@
   .feature:hover .feature-art span { transform: rotate(0deg) scale(1.06); -webkit-text-stroke-color: #fff; }
   @media (min-width: 900px) { .feature { grid-template-columns: 1.1fr 1fr; } }
 
+    /* ---------- SKINWALKER POP-UP ---------- */
+  .feature-wrap { position: relative; }
+  .feature-wrap .feature { z-index: 1; }
+  .skin {
+    position: absolute; top: 0; right: 6%; z-index: 0; pointer-events: none;
+    width: clamp(240px, 34vw, 460px);
+    transform: translateY(calc(var(--p, 0) * -62%));
+    opacity: var(--p, 0);
+  }
+  .skin img {
+    display: block; width: 100%; height: auto;
+    filter: drop-shadow(0 0 36px rgba(229,25,43,.4));
+    animation: lurk 3.2s ease-in-out infinite;
+  }
+  @keyframes lurk {
+    0%, 100% { transform: translate(0,0) rotate(0deg); }
+    30% { transform: translate(-4px,2px) rotate(-.8deg); }
+    60% { transform: translate(3px,-2px) rotate(.6deg); }
+    62% { transform: translate(-6px,0) rotate(-1.2deg); }
+    64% { transform: translate(0,0) rotate(0deg); }
+  }
+  @media (hover: hover) {
+    .skin { transition: transform .75s cubic-bezier(.34,1.56,.64,1), opacity .25s; }
+    .feature-wrap:hover { --p: 1; }
+  }
+
   /* ---------- SLIDER (Twitch Games) ---------- */
   #games { background: var(--bg-deep); }
   #games::before { content: ""; position: absolute; width: 50vmax; height: 50vmax; left: -20vmax; top: 10%; border-radius: 50%; background: radial-gradient(circle, rgba(75,0,130,.35), transparent 65%); pointer-events: none; }
@@ -315,8 +341,9 @@
       <p class="sec-note">Indie Developer DaggerBoobs Steam Page.</p>
     </div>
     <div class="wrap">
-      <a class="feature reveal" href="https://store.steampowered.com/app/3734060/Night_Shift_at_the_Cement_Plant/" target="_blank" rel="noopener">
-        <div class="feature-info">
+      <div class="feature-wrap reveal">
+      <div class="skin"><img src="skinwalker.png" alt="" aria-hidden="true"></div>
+      <a class="feature" href="https://store.steampowered.com/app/3734060/Night_Shift_at_the_Cement_Plant/" target="_blank" rel="noopener">        <div class="feature-info">
           <div class="idx"><span>01</span><span class="tag">Steam</span><span class="tag">Horror</span><span class="tag">Skinwalkers</span><span class="tag">Psychological Horror</span></div>
           <div>
             <h3>Night Shift at the Cement Plant</h3>
@@ -327,6 +354,7 @@
         </div>
         <div class="feature-art"><span>Wishlist</span></div>
       </a>
+      </div>
     </div>
   </section>
 
@@ -496,6 +524,19 @@
   });
   window.addEventListener('pointerup', function () { down = false; slider.classList.remove('drag'); });
   slider.addEventListener('click', function (e) { if (moved) { e.preventDefault(); moved = false; } }, true);
+  
+  // Skinwalker rises as the card scrolls into view (touch devices)
+  var skinWrap = document.querySelector('.feature-wrap');
+  var touchOnly = window.matchMedia('(hover: none)');
+  function skinScroll() {
+    if (!touchOnly.matches || !skinWrap) return;
+    var r = skinWrap.getBoundingClientRect(), vh = window.innerHeight;
+    var p = (vh * 0.85 - r.top) / (vh * 0.45);
+    skinWrap.style.setProperty('--p', Math.max(0, Math.min(1, p)));
+  }
+  window.addEventListener('scroll', skinScroll, { passive: true });
+  window.addEventListener('resize', skinScroll);
+  skinScroll();
 })();
 </script>
 </body>
